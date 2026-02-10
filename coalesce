@@ -1,0 +1,45 @@
+-- Display Country name, 4-digit year, count of Nobel prize winners (where the count is ≥ 1), and country size:
+-- Large: Population > 100 million
+-- Medium: Population between 50 and 100 million (inclusive)
+-- Small: Population < 50 million
+SELECT 
+c.country,
+cs.year AS calendar_year,
+cs.nobel_prize_winners,
+CASE 
+WHEN cs.pop_in_millions::numeric > 100 THEN 'large'
+WHEN cs.pop_in_millions::numeric >= 50 THEN 'medium'
+ELSE 'small'
+END AS country_size
+FROM country_stats cs
+JOIN countries c 
+ON cs.country_id = c.id
+WHERE cs.nobel_prize_winners >= 1
+ORDER BY c.country, cs.year;
+
+-- Sort results so that the country and year with the largest number of Nobel prize winners appear at the top.
+SELECT 
+c.country,
+cs.year AS calendar_year,
+cs.nobel_prize_winners,
+CASE 
+WHEN cs.pop_in_millions::numeric > 100 THEN 'large'
+WHEN cs.pop_in_millions::numeric >= 50 THEN 'medium'
+ELSE 'small'
+END AS country_size
+FROM country_stats cs
+JOIN countries c 
+ON cs.country_id = c.id
+WHERE cs.nobel_prize_winners >= 1
+ORDER BY cs.nobel_prize_winners DESC, c.country, cs.year;
+
+-- Create the output below that shows a row for each country and each year. Use COALESCE() to display unknown when the gdp is NULL.
+SELECT 
+c.country,
+cs.year AS calendar_year,
+COALESCE(cs.gdp::text, 'unknown') AS gdp_amount
+FROM countries c
+LEFT JOIN country_stats cs
+ON c.id = cs.country_id
+ORDER BY c.country, cs.year;
+
